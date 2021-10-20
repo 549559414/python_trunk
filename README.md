@@ -5,6 +5,7 @@
 #解决办法是高级系统设置里面“环境变量”-》“用户变量”-》变量名“QT_QPA_PLATFORM_PLUGIN_PATH”，变量值-》“D:\学习\software_python_code\python_trunk\venv\Lib\site-packages\PySide2\plugins\platforms”
 
 
+#2021/10/19
 #关于在系统编译正常，但是生成exe文件时“Failed to execute script main”出现两个问题。
 #调用PySide2库时__init__.py需要修改
 #shiboken2 = root
@@ -14,3 +15,9 @@
 #os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = plugin_path
 #编译时使用的是本地工程的库“D:\学习\software_python_code\python_trunk\venv”，但是生成exe文件时使用的是“C:\Users\Administrator\AppData\Local\Programs\Python\Python39\Lib\site-packages”
 #所以导致编译正常然后生成exe文件不正常。解决方法就是把本地编译的库同步更新到exe所需要的库里面。
+
+
+#2021/10/20
+#关于使用QT designer生成exe提示“ImportError: could not import module 'PySide2.QtXml'”问题
+#在执行生成指令时改为“pyinstaller -F -w main.py --hidden-import PySide2.QtXml”
+#exe文件需要看转载ui路径路径

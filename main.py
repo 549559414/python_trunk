@@ -1,51 +1,44 @@
 import socket
-from PySide2.QtWidgets import QApplication, QMainWindow, QPushButton,  QPlainTextEdit
+from PySide2.QtWidgets import QApplication
+from PySide2.QtUiTools import QUiLoader
+
 msg1 = "\x55\x55\x55\x00\x00\x00\x00\x55\x55\x55"
 msg2 = "\x55\x55\x55\x00\x00\x00\x01\x55\x55\x55"
 
-def handleCalc1():
-    # 1.创建一个udp套接字
-    udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-    # 2.准备接收方的地址
-    # 192.168.65.149 表示目的地ip
-    # 30000  表示目的地端口
-    udp_socket.sendto(msg1.encode("utf-8"), ("192.168.10.199", 5000))
+class Stats:
 
-    # 3.关闭套接字
-    udp_socket.close()
-def handleCalc2():
-    # 1.创建一个udp套接字
-    udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    def __init__(self):
+        # 从文件中加载UI定义
 
-    # 2.准备接收方的地址
-    # 192.168.65.149 表示目的地ip
-    # 30000  表示目的地端口
-    udp_socket.sendto(msg2.encode("utf-8"), ("192.168.10.199", 5000))
+        # 从 UI 定义中动态 创建一个相应的窗口对象
+        # 注意：里面的控件对象也成为窗口对象的属性了
+        # 比如 self.ui.button , self.ui.textEdit
+        self.ui = QUiLoader().load('.\\ui\\继电器开关.ui')
 
-    # 3.关闭套接字
-    udp_socket.close()
+        self.ui.Button.clicked.connect(self.handleCalc1)
+        self.ui.Button_2.clicked.connect(self.handleCalc2)
+
+    def handleCalc1(self):
+        # 1.创建一个udp套接字
+        udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # 2.准备接收方的地址
+        # 192.168.65.149 表示目的地ip
+        # 30000  表示目的地端口
+        udp_socket.sendto(msg1.encode("utf-8"), ("192.168.10.199", 5000))
+        # 3.关闭套接字
+        udp_socket.close()
+    def handleCalc2(self):
+        # 1.创建一个udp套接字
+        udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # 2.准备接收方的地址
+        # 192.168.65.149 表示目的地ip
+        # 30000  表示目的地端口
+        udp_socket.sendto(msg2.encode("utf-8"), ("192.168.10.199", 5000))
+        # 3.关闭套接字
+        udp_socket.close()
 
 app = QApplication([])
-
-window = QMainWindow()
-window.resize(500, 400)
-window.move(300, 310)
-window.setWindowTitle('继电器控制系统')
-
-#textEdit = QPlainTextEdit(window)
-#textEdit.setPlaceholderText("请输入薪资表")
-#textEdit.move(10,25)
-#textEdit.resize(300,350)
-
-button1 = QPushButton('继电器开', window)
-button1.move(80,80)
-button1.clicked.connect(handleCalc1)
-
-button2 = QPushButton('继电器关', window)
-button2.move(320,80)
-button2.clicked.connect(handleCalc2)
-
-window.show()
-
+stats = Stats()
+stats.ui.show()
 app.exec_()
