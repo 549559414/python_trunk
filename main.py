@@ -1,10 +1,22 @@
 import socket
 from PySide2.QtWidgets import QApplication
 from PySide2.QtUiTools import QUiLoader
+from PySide2.QtGui import QPixmap
 
-msg1 = "\x55\x55\x55\x00\x00\x00\x00\x55\x55\x55"
-msg2 = "\x55\x55\x55\x00\x00\x00\x01\x55\x55\x55"
+msg1_open = "\x55\x55\x55\x00\x00\x00\x00\x55\x55\x55"
+msg1_close = "\x55\x55\x55\x00\x00\x00\x01\x55\x55\x55"
 
+class IPConfig:
+    def IPInit(self):
+        global ip0
+        f = open("ipconfig.txt", "r")  # 设置文件对象
+
+        data = f.readlines()  # 直接将文件中按行读到list里，效果与方法2一样
+
+        ip0str=data[0]
+        ip0=ip0str[4:-1]
+
+        f.close()  # 关闭文件
 
 class Stats:
 
@@ -18,27 +30,56 @@ class Stats:
 
         self.ui.Button.clicked.connect(self.handleCalc1)
         self.ui.Button_2.clicked.connect(self.handleCalc2)
+        Pixmap = QPixmap('.\\ui\\福建省高速公路.png')
+        self.ui.label4.setPixmap(Pixmap)
+        IPConfig.IPInit(self)
+        #Stats.handleCalc1(self)
 
     def handleCalc1(self):
         # 1.创建一个udp套接字
         udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # 2.准备接收方的地址
-        # 192.168.65.149 表示目的地ip
-        # 30000  表示目的地端口
-        udp_socket.sendto(msg1.encode("utf-8"), ("192.168.10.199", 5000))
+        # 192.168.10.199 表示目的地ip
+        # 5000  表示目的地端口
+        #udp_socket.bind(("", 5000))
+        udp_socket.sendto(msg1_open.encode("utf-8"), (ip0, 5000))
+        # 3. 接收打印数据
+        udp_socket.settimeout(5)
+        recvData = udp_socket.recvfrom(1024)
+        print(recvData)
         # 3.关闭套接字
         udp_socket.close()
+        #显示开图标
+        self.ui.label.clear()
+        self.ui.label.setText("开")
+        Pixmap = QPixmap('.\\ui\\绿色.jpg')
+        self.ui.label.setPixmap(Pixmap)
+        # 实时刷新界面
+        QApplication.processEvents()
+
     def handleCalc2(self):
         # 1.创建一个udp套接字
         udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         # 2.准备接收方的地址
-        # 192.168.65.149 表示目的地ip
-        # 30000  表示目的地端口
-        udp_socket.sendto(msg2.encode("utf-8"), ("192.168.10.199", 5000))
+        # 192.168.10.199 表示目的地ip
+        # 5000  表示目的地端口
+        udp_socket.sendto(msg1_close.encode("utf-8"), (ip0, 5000))
+        udp_socket.settimeout(5)
+        recvData = udp_socket.recvfrom(1024)
+        print(recvData)
         # 3.关闭套接字
         udp_socket.close()
+        #显示关图标
+        self.ui.label.clear()
+        self.ui.label.setText("关")
+        Pixmap = QPixmap('.\\ui\\红色.jpg')
+        self.ui.label.setPixmap(Pixmap)
+        # 实时刷新界面
+        QApplication.processEvents()
+
 
 app = QApplication([])
 stats = Stats()
 stats.ui.show()
+
 app.exec_()
